@@ -40,4 +40,4 @@
         ec2_elbs: Test
         state: present
       tags:
-      - attach_instanc
+      - attach_instance
