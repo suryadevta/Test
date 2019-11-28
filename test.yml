@@ -1,0 +1,24 @@
+- name: Create a small instance
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: create a new image
+      ec2_ami:
+        instance_id: i-0e3c0bc6bbb04c140
+        wait: yes
+        name: ansible1
+        region: us-east-1
+        no_reboot: yes
+        tags:
+          Name: Ansible
+      tags:
+      - create_image
+    - name: pause for some time
+      pause:
+            minutes: 4
+    - name: deploy multiple servers with below yaml file
+      include_tasks: test2.yml
+      loop:
+           - Ansible1
+             #- Python
