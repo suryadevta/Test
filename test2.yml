@@ -1,0 +1,43 @@
+# find Image ID
+    - name: find a new image
+
+      ec2_ami_info:
+       region: us-east-1
+       filters:
+          "tag:Name": Ansible
+      register: ami_info
+      tags:
+      - find_image
+ #creating multiple instances
+    - name: create a new instane
+      ec2:
+        key_name: mac_key
+        instance_type: t2.micro
+        image: "{{ami_info.images[0].image_id}}"
+        wait: yes
+        group: default
+        count: 1
+        instance_tags:
+            Name: "{{item}}"
+            vpc_subnet_id: subnet-921918bc
+            assign_public_ip: yes
+        region: us-east-1
+ #getting instances info
+    - name: getting instane info
+      ec2_instance_info:
+           region: us-east-1
+           filters:
+               "tag:Name": "{{item}}"
+      register: instance_info
+    - name: pause for some time
+      pause:
+            minutes: 3
+    - name: attaching instane with ELB
+  #attach instance with ELB
+      ec2_elb:
+        region: us-east-1
+        instance_id: "{{instance_info.instances[0].instance_id}}"
+        ec2_elbs: Test
+        state: present
+      tags:
+      - attach_instanc
